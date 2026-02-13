@@ -1,11 +1,33 @@
-- name: Install CRI-O and dependencies
+- name: Ensure keyrings dir exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Add CRI-O key
+  get_url:
+    url: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key"
+    dest: /etc/apt/keyrings/crio.key
+
+- name: Convert CRI-O key
+  command: >
+    gpg --dearmor -o /etc/apt/keyrings/crio-apt-keyring.gpg /etc/apt/keyrings/crio.key
+  creates: /etc/apt/keyrings/crio-apt-keyring.gpg
+
+- name: Add CRI-O repo
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/crio-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/ /"
+    filename: cri-o
+    state: present
+
+- name: Install CRI-O
   apt:
-    name: [ 'cri-o', 'cri-o-runc', 'libseccomp2' ]
+    name: cri-o
     state: present
     update_cache: yes
 
-- name: Enable and start CRI-O
+- name: Enable CRI-O
   systemd:
     name: crio
-    state: started
     enabled: yes
+    state: started
