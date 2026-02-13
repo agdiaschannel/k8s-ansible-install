@@ -1,0 +1,6 @@
+---
+- name: Prepare all nodes (Master & Workers)
+  hosts: k8s_cluster
+  become: yes
+  roles:
+  - k8s_setup

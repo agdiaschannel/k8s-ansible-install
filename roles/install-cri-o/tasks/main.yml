@@ -1,0 +1,11 @@
+- name: Install CRI-O and dependencies
+  apt:
+    name: [ 'cri-o', 'cri-o-runc', 'libseccomp2' ]
+    state: present
+    update_cache: yes
+
+- name: Enable and start CRI-O
+  systemd:
+    name: crio
+    state: started
+    enabled: yes
